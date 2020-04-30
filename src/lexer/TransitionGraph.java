@@ -167,12 +167,40 @@ public class TransitionGraph {
 				else if(token_list_size >= 2 &&
 						tokens.get(token_list_size - 1).getKey().matches("INTEGER") &&
 						now_node.getState().matches("FLOAT")) {
-					// ex> 00.534; statement에서 <INTEGER><FLOAT>으로 나오는 문제
-					// 유효하지 않은 token이므로 에러 리포트를 출력한다.
-					is_error = true;
-					printer.printErrorReport(linenum, tokens.get(token_list_size - 1).getValue(), buffer);
-					return;
+					if(buffer.charAt(0) != '-') {
+						// ex> 00.534; statement에서 <INTEGER><FLOAT>으로 나오는 문제
+						// 유효하지 않은 token이므로 에러 리포트를 출력한다.
+						is_error = true;
+						printer.printErrorReport(linenum, tokens.get(token_list_size - 1).getValue(), buffer);
+					}
+					else {
+						// ex> 0-0.534; statement에서 <INTEGER><FLOAT>으로 나오는 문제
+						// <INTEGER><FLOAT>로 나오는 경우는 이런 경우로 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 FLOAT로 나누어
+						// <INTEGER><ARITHMETIC><FLOAT>로 바꾸어 출력한다.
+						String floating_val = buffer.split("-")[1];
+						tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
+						tokens.add(new SimpleEntry<String, String>("FLOAT", floating_val));
+						printer.printSymbolTable("ARIMTHMETIC", "-");
+						printer.printSymbolTable("FLOAT", floating_val);
+					}
 					//System.exit(0);
+				}
+				else if(token_list_size >= 2 &&
+						tokens.get(token_list_size - 1).getKey().matches("FLOAT") &&
+						now_node.getState().matches("INTEGER")) {
+					// ex> 0.534-4; statement에서 <FLOAT><INTEGER>으로 나오는 문제
+					// <FLOAT><INTEGER>로 나오는 경우는 이런 경우로 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 INTEGER로 나누어
+					// <FLOAT><ARITHMETIC><INTEGER>로 바꾸어 출력한다.
+					String integer_val = buffer.split("-")[1];
+					tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
+					tokens.add(new SimpleEntry<String, String>("INTEGER", integer_val));
+					printer.printSymbolTable("ARIMTHMETIC", "-");
+					printer.printSymbolTable("INTEGER", integer_val);
+				}
+				else if(buffer.matches("-0")) {
+					// -0으로 끝나는 경우 유효하지 않은 토큰이므로 에러 리포트 출력
+					is_error = true;
+					printer.printErrorReport(linenum, buffer);
 				}
 				else {
 					tokens.add(new SimpleEntry<String, String>(now_node.getState(), buffer));
@@ -190,9 +218,9 @@ public class TransitionGraph {
 			}
 			else {
 				is_error = true;
-				printer.printErrorReport(linenum, buffer, input_symbol);
-				//System.exit(0);
-				return;
+				printer.printErrorReport(linenum, buffer);
+				now_node = nodes.get(0);
+				recognizeTokens(input_symbol, linenum);
 			}
 		}
 	}
