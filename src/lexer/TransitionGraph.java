@@ -16,6 +16,8 @@ public class TransitionGraph {
 	private ArrayList<Transition> transitions;
 	private HashMap<SimpleEntry<Integer, Integer>, String> transition_map;
 	private ArrayList<SimpleEntry<String, String> > tokens;
+	private char prev_symbol;
+	private StateNode prev_node;
 	private StateNode now_node;
 	private String buffer;
 	private boolean is_error;
@@ -28,6 +30,8 @@ public class TransitionGraph {
 		this.tokens = new ArrayList<SimpleEntry<String, String> >();
 		readGraphInfoFile();
 		this.alphabet = new AlphabetSet();
+		this.prev_symbol = '\0';
+		this.prev_node = null;
 		// start node
 		this.now_node = nodes.get(0);
 		this.is_error = false;
@@ -102,11 +106,26 @@ public class TransitionGraph {
 	public void recognizeTokens(char input_symbol, int linenum) {
 		boolean no_valid_condition = true;
 		ArrayList<StateNode> linked_nodes = now_node.getLinkedNode();
-
+		
+		if(input_symbol == '-' && !now_node.getState().matches("WHITESPACE")) {
+			// - 숫자, 연산에 대한 예외처리
+			// '숫자 - 숫자' or 'IDENTIFIER-숫자' 연산식에서 -를 ARITHMETIC으로 처리하기 위함 
+			if(tokens.size()>1 &&
+			   (tokens.get(tokens.size()-1).getKey().matches("IDENTIFIER") || 
+			   tokens.get(tokens.size()-1).getKey().matches("INTEGER") ||
+			   tokens.get(tokens.size()-1).getKey().matches("FLOAT"))) {
+				now_node = nodes.get(0);
+				buffer = "";
+				tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
+				printer.printSymbolTable("ARITHMETIC", "-");
+				return;
+			}
+		}
+		
 		for(int i = 0; i < linked_nodes.size(); i++) {
 			int linked_id = linked_nodes.get(i).getId();
 			//
-			//System.out.println(now_node.getId() +" to " + linked_id);
+			System.out.println(now_node.getId() +" to " + linked_id);
 			SimpleEntry<Integer, Integer> key = new SimpleEntry<Integer, Integer>(now_node.getId(), linked_id);
 			String transition = transition_map.get(key);
 		
@@ -119,9 +138,11 @@ public class TransitionGraph {
 				}
 			}
 			
-			if(alphabet.isValidCondition(transition, input_symbol)) {
+			if(alphabet.isValidCondition(transition, input_symbol)) {			
 				// 유효한 조건이 있으면 버퍼에 심볼을 추가하고 현재 노드를 그 노드로 갱신
 				buffer += input_symbol;
+				prev_symbol = input_symbol;
+				prev_node = now_node;
 				now_node = nodes.get(linked_id);
 				no_valid_condition = false;
 				break;
@@ -138,88 +159,54 @@ public class TransitionGraph {
 			 * 
 			 * start node인데 valid condition이 부재이면 에러 메시지 출력
 			 */
+			
 			if(!now_node.getState().matches("none") && !now_node.getState().matches("start")) {
-				int token_list_size = tokens.size();
-				if(token_list_size >= 2 &&
-						tokens.get(token_list_size - 1).getKey().matches("INTEGER") &&
-						now_node.getState().matches("INTEGER")) {
-					// 2 - 3; statement에서 <INTEGER><INTEGER>로 나오는 문제
-					// <INTEGER><INTEGER>로 나오는 경우는 이 경우 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 INTEGER로 나누어
-					// <INTEGER><ARITHMETIC><INTEGER>로 바꾸어 출력한다.
-					String integer_val = buffer.split("-")[1];
+				if(buffer.matches("-0")) {
 					tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
-					tokens.add(new SimpleEntry<String, String>("INTEGER", integer_val));
+					tokens.add(new SimpleEntry<String, String>("INTEGER", "0"));
 					printer.printSymbolTable("ARITHMETIC", "-");
-					printer.printSymbolTable("INTEGER", integer_val);
+					printer.printSymbolTable("INTEGER", "0");
+					now_node = nodes.get(0);
+					buffer="";
+					recognizeTokens(input_symbol, linenum);
+					return;
 				}
-				else if(token_list_size >= 2 &&
-						tokens.get(token_list_size - 1).getKey().matches("FLOAT") &&
-						now_node.getState().matches("FLOAT")) {
-					// ex> 0.534-0.443; statement에서 <FLOAT><FLOAT>로 나오는 문제
-					// <FLOAT><FLOAT>로 나오는 경우는 이런 경우로 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 FLOAT로 나누어
-					// <FLOAT><ARITHMETIC><FLOAT>로 바꾸어 출력한다.
-					String floating_val = buffer.split("-")[1];
-					tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
-					tokens.add(new SimpleEntry<String, String>("FLOAT", floating_val));
-					printer.printSymbolTable("ARITHMETIC", "-");
-					printer.printSymbolTable("FLOAT", floating_val);
-				}
-				else if(token_list_size >= 2 &&
-						tokens.get(token_list_size - 1).getKey().matches("INTEGER") &&
-						now_node.getState().matches("FLOAT")) {
-					if(buffer.charAt(0) != '-') {
-						// ex> 00.534; statement에서 <INTEGER><FLOAT>으로 나오는 문제
-						// 유효하지 않은 token이므로 에러 리포트를 출력한다.
-						is_error = true;
-						printer.printErrorReport(linenum, tokens.get(token_list_size - 1).getValue(), buffer);
-					}
-					else {
-						// ex> 0-0.534; statement에서 <INTEGER><FLOAT>으로 나오는 문제
-						// <INTEGER><FLOAT>로 나오는 경우는 이런 경우로 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 FLOAT로 나누어
-						// <INTEGER><ARITHMETIC><FLOAT>로 바꾸어 출력한다.
-						String floating_val = buffer.split("-")[1];
-						tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
-						tokens.add(new SimpleEntry<String, String>("FLOAT", floating_val));
-						printer.printSymbolTable("ARIMTHMETIC", "-");
-						printer.printSymbolTable("FLOAT", floating_val);
-					}
-					//System.exit(0);
-				}
-				else if(token_list_size >= 2 &&
-						tokens.get(token_list_size - 1).getKey().matches("FLOAT") &&
-						now_node.getState().matches("INTEGER")) {
-					// ex> 0.534-4; statement에서 <FLOAT><INTEGER>으로 나오는 문제
-					// <FLOAT><INTEGER>로 나오는 경우는 이런 경우로 유일하므로 이런 식의 출력은 현재 출력할 token을 -와 INTEGER로 나누어
-					// <FLOAT><ARITHMETIC><INTEGER>로 바꾸어 출력한다.
-					String integer_val = buffer.split("-")[1];
-					tokens.add(new SimpleEntry<String, String>("ARITHMETIC", "-"));
-					tokens.add(new SimpleEntry<String, String>("INTEGER", integer_val));
-					printer.printSymbolTable("ARIMTHMETIC", "-");
-					printer.printSymbolTable("INTEGER", integer_val);
-				}
-				else if(buffer.matches("-0")) {
-					// -0으로 끝나는 경우 유효하지 않은 토큰이므로 에러 리포트 출력
-					is_error = true;
-					printer.printErrorReport(linenum, buffer);
-				}
-				else {
-					tokens.add(new SimpleEntry<String, String>(now_node.getState(), buffer));
-					printer.printSymbolTable(now_node.getState(), buffer);
-				}
+				
+				tokens.add(new SimpleEntry<String, String>(now_node.getState(), buffer));
+				printer.printSymbolTable(now_node.getState(), buffer);
 				now_node = nodes.get(0);
 				buffer="";
 				recognizeTokens(input_symbol, linenum);
 			}
+			else if(now_node.getState().matches("none")) {
+				// -0.00.0 같은 예시 처리 -0.00000.0 또는 -4.1290.4 / -4.129000.4
+				// 완료
+				if(prev_node.getState().matches("FLOAT")) {
+					buffer = buffer.substring(0, buffer.length()-1);
+					tokens.add(new SimpleEntry<String, String>("FLOAT", buffer));
+					printer.printSymbolTable("FLOAT", buffer);
+					now_node = nodes.get(0);
+					buffer = "";
+					recognizeTokens(prev_symbol, linenum);
+					recognizeTokens(input_symbol, linenum);
+				}
+				else {
+					is_error = true;
+					printer.printErrorReport(linenum, buffer, input_symbol);
+					now_node = nodes.get(0);
+					buffer="";
+				}
+			}
 			else if(now_node.getState().matches("start")){
 				is_error = true;
 				printer.printErrorReport(linenum, tokens.get(tokens.size()-1).getValue(), input_symbol);
-				//System.exit(0);
-				return;
+				buffer="";
 			}
 			else {
 				is_error = true;
 				printer.printErrorReport(linenum, buffer);
 				now_node = nodes.get(0);
+				buffer="";
 				recognizeTokens(input_symbol, linenum);
 			}
 		}
