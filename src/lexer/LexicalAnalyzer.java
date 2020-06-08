@@ -16,8 +16,10 @@ public class LexicalAnalyzer {
 		this.token_list = new ArrayList<SimpleEntry<String, String> >();
 		this.filepath = "./data/" + filename;
 	}
+	
 	public void run() {
 		int linenum = 1;
+		
 		String[] path_token = filepath.split("/");
 		String filename = path_token[2].split("\\.")[0];
 		TransitionGraph graph = new TransitionGraph(filename);
@@ -30,7 +32,7 @@ public class LexicalAnalyzer {
 	 
 	        while((singleCh = file_reader.read()) != -1){
 	        	//
-	        	System.out.println((char)singleCh);
+	        	// System.out.println((char)singleCh);
 	            graph.recognizeTokens((char)singleCh, linenum);
 	        	if((char)singleCh == '\n') linenum++;
 	        }

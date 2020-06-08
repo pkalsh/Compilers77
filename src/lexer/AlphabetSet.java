@@ -18,7 +18,8 @@ public class AlphabetSet {
 		if(condition.matches("Minus")) return isMinusSign(c);
 		if(condition.matches("DoubleQuote")) return isDoubleQuote(c);
 		if(condition.matches("Comma")) return isComma(c);
-		if(condition.matches("Arithmetic")) return isArithmeticOperation(c);
+		if(condition.matches("Add")) return isAdd(c);
+		if(condition.matches("MultDiv")) return isMultDiv(c);
 		if(condition.matches("Termination")) return isTermination(c);
 		if(condition.matches("LBracket")) return isLBracket(c);
 		if(condition.matches("RBracket")) return isRBracket(c);
@@ -177,9 +178,11 @@ public class AlphabetSet {
 	public static boolean isMinusSign(char c) {
 		return c == '-';
 	}
-	public static boolean isArithmeticOperation(char c) {
+	public static boolean isAdd(char c) {
 		// -를 제외한 산술 연산
-		return c == '+' || c == '*' || c == '/';
+		return c == '+';
 	}
-	
+	public static boolean isMultDiv(char c) {
+		return c == '*' || c == '/';
+	}
 }

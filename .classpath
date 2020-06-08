@@ -2,5 +2,15 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-3.0-rc4-20070503.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-contrib-3.0-rc4-20070503.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-examples-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-excelant-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-ooxml-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-ooxml-schemas-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-scratchpad-3.0-rc4-20070503.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/poi-scratchpad-4.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/82109/work/caustudy/3-1/Compiler/Assignment/Compilers77/commons-collections4-4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
