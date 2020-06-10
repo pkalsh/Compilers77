@@ -38,24 +38,34 @@ public class SLRParsingTable {
 	}
 	
 	public String getCellValue(int current_state, Symbol next_symbol) {
-		System.out.println(sheet.getPhysicalNumberOfRows());
-		if (sheet.getRow(1) != null) {
-			for(short col = ACTION_START_COL; col <= GOTO_END_COL; col++) {
-				XSSFCell cell = sheet.getRow(0).getCell(col);
-				if(cell.getRawValue().matches(next_symbol.getContent())) {
-					return sheet.getRow(current_state + 2).getCell(col).getRawValue();
+		try {
+			System.out.println(next_symbol);
+			if (sheet.getRow(1) != null) {
+				if (next_symbol.getType().matches("terminal")) {
+					for(short col = ACTION_START_COL; col <= ACTION_END_COL; col++) {
+						XSSFCell cell = sheet.getRow(1).getCell(col);
+						System.out.println(cell.getStringCellValue());
+						if(cell.getStringCellValue().matches(next_symbol.getContent())) {
+							return sheet.getRow(current_state + 1).getCell(col).getStringCellValue();
+						};
+					}
 				}
-				System.out.println(cell.getRawValue());
+				else {
+					// nonterminal일 경우 cell 값을 숫자 값으로 가져온다.
+					for(short col = GOTO_START_COL; col <= GOTO_END_COL; col++) {
+						XSSFCell cell = sheet.getRow(1).getCell(col);
+						if(cell.getStringCellValue().matches(next_symbol.getContent())) {
+							// getNumericCellValue는 double 값을 가져오므로 int로 형변환하여 String 값으로 변환하고 그 값을 반환한다.
+							return Integer.toString((int)sheet.getRow(current_state + 1).getCell(col).getNumericCellValue());
+						};
+					}
+				}
 			}
+		} catch(java.lang.NullPointerException e) {
+			return null;
 		}
 		return null;
 	}
-	
-	public static void main(String[] args) {
-		String path = SLRParsingTable.class.getResource("").getPath();
-	    System.out.println(path);
-		SLRParsingTable table = new SLRParsingTable(path + "\\data\\SLR_parsing_table.xlsx");
-		System.out.println(table.getCellValue(1, new Symbol("VDECL")));
-	}
+
 }
 
