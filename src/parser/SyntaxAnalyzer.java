@@ -47,6 +47,7 @@ public class SyntaxAnalyzer {
 			input_symbols.remove(remove_pos);
 		}
 		input_symbols.add(remove_pos, reduced_symbol);
+		for(Symbol sym:input_symbols) System.out.println(sym);
 	}
 	
 	public void printErrorReport() {
