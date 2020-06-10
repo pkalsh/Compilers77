@@ -27,9 +27,10 @@ public class SyntaxAnalyzer {
 			if(!token_list.get(i).getKey().matches("whitespace")) {
 				this.input_symbols.addLast(new Symbol(token_list.get(i).getKey()));
 			}
-			// add end marker
-			this.input_symbols.addLast(new Symbol("$"));
 		}
+		
+		// add end marker
+		this.input_symbols.addLast(new Symbol("$"));
 	}
 	
 	public void reduceSymbols(int CFG_num) {
@@ -63,6 +64,7 @@ public class SyntaxAnalyzer {
 		while(input_symbols.get(0) != start_symbol) {
 			// stack의 크기가 곧 splitter의 위치이다.
 			int current_state = stack.peek();
+			System.out.println("currnet_state: " + current_state);
 			next_symbol_pos = stack.size() - 1;
 			String cell = table.getCellValue(current_state, input_symbols.get(next_symbol_pos));
 			
