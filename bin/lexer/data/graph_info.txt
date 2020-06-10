@@ -1,12 +1,4 @@
 N/start/0
-N/IDENTIFIER/1/a,e,h,f,l,n,r,o
-N/IDENTIFIER/2/l
-N/IDENTIFIER/3/s
-N/IDENTIFIER/4/e
-N/BOOLEAN/5
-N/IDENTIFIER/6/t
-N/IDENTIFIER/7/u
-N/IDENTIFIER/8/rN/start/0
 N/id/1/a,e,h,f,l,n,r,o
 N/id/2/l
 N/id/3/s
