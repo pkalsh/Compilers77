@@ -33,14 +33,14 @@ public class SyntaxAnalyzer {
 		}
 	}
 	
-	public void run() throws IOException {
+	public void run() {
 		String path = SLRParsingTable.class.getResource("").getPath();
 	    
 		SLRParsingTable table = new SLRParsingTable(path + "\\data\\SLR_parsing_table.xlsx");
 		
-		while(!stack.empty()) {
-			
-		}
+		//while(!stack.empty()) {
+		//	
+		//}
 	}
 	
 }

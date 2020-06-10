@@ -1,13 +1,8 @@
-int ea=123-234;
-float f=ea-342.5;
+int a=2;
+int b=3;
 
-
--4.293.5
--5.1290.4
--0.00.0
--0.0000.0
--0
--0.0
--0.00
-0.abc
-if123abc
+int main() {
+	int c=a/b;
+	int d=a+b;
+	return 0;
+}

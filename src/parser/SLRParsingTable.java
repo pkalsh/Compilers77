@@ -25,14 +25,20 @@ public class SLRParsingTable {
 	private final short GOTO_START_COL = 22;
 	private final short GOTO_END_COL = 36;
 	
-	public SLRParsingTable(String path) throws IOException{
-		this.fis = new FileInputStream(path);
-		this.workbook = new XSSFWorkbook(fis);
-		// 첫번째 시트를 가져온다.
-		this.sheet = this.workbook.getSheetAt(0);
+	public SLRParsingTable(String path){
+		try {
+			this.fis = new FileInputStream(path);
+			this.workbook = new XSSFWorkbook(fis);
+			// 첫번째 시트를 가져온다.
+			this.sheet = this.workbook.getSheetAt(0);
+		}
+		catch(Exception e) { 
+			e.printStackTrace();
+		}
 	}
 	
 	public String getCellValue(int current_state, Symbol next_symbol) {
+		System.out.println(sheet.getPhysicalNumberOfRows());
 		if (sheet.getRow(1) != null) {
 			for(short col = ACTION_START_COL; col <= GOTO_END_COL; col++) {
 				XSSFCell cell = sheet.getRow(0).getCell(col);
@@ -45,11 +51,11 @@ public class SLRParsingTable {
 		return null;
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		String path = SLRParsingTable.class.getResource("").getPath();
-	    
+	    System.out.println(path);
 		SLRParsingTable table = new SLRParsingTable(path + "\\data\\SLR_parsing_table.xlsx");
-		
+		System.out.println(table.getCellValue(1, new Symbol("VDECL")));
 	}
 }
 
