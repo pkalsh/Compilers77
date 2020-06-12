@@ -11,7 +11,7 @@ public class Symbol {
 		{
 				"vtype", "id", "num", "float", "literal", "if", "else", "while", "for",
 				"return", "addsub", "multdiv", "assign", "comp", "semi", "comma", "lparen",
-				"rparen", "lbrace", "rbrace", "$"
+				"rparen", "lbrace", "rbrace", "end"
 		};
 	
 	private String content;
@@ -24,12 +24,14 @@ public class Symbol {
 		for(String nonterminal:nonterminal_list) {
 			if(nonterminal.matches(token)) {
 				this.type = "nonterminal";
+				break;
 			}
 		}
 		
 		for(String terminal:terminal_list) {
 			if(terminal.matches(token)) {
 				this.type = "terminal";
+				break;
 			}
 		}
 	}

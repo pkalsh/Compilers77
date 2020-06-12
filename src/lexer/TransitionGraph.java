@@ -125,10 +125,9 @@ public class TransitionGraph {
 		for(int i = 0; i < linked_nodes.size(); i++) {
 			int linked_id = linked_nodes.get(i).getId();
 			//
-			// System.out.println(now_node.getId() +" to " + linked_id);
 			SimpleEntry<Integer, Integer> key = new SimpleEntry<Integer, Integer>(now_node.getId(), linked_id);
 			String transition = transition_map.get(key);
-		
+			
 			if(transition.matches("NotGivenLetter")) {
 				if(alphabet.isValidCondition(transition, input_symbol, now_node.getKeywordIdentifier())) {
 					buffer += input_symbol;

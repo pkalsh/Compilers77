@@ -31,11 +31,13 @@ public class LexicalAnalyzer {
 	        int singleCh = 0;
 	 
 	        while((singleCh = file_reader.read()) != -1){
+	        	// System.out.println("singleCh: " + (char)singleCh);
 	        	//
 	        	// System.out.println((char)singleCh);
 	            graph.recognizeTokens((char)singleCh, linenum);
 	        	if((char)singleCh == '\n') linenum++;
 	        }
+	        graph.recognizeTokens(' ', linenum);
 	        file_reader.close();
 	     } catch (FileNotFoundException e) {
 	            e.getStackTrace();
