@@ -39,12 +39,10 @@ public class SLRParsingTable {
 	
 	public String getCellValue(int current_state, Symbol next_symbol) {
 		try {
-			System.out.println(next_symbol);
 			if (sheet.getRow(1) != null) {
 				if (next_symbol.getType().matches("terminal")) {
 					for(short col = ACTION_START_COL; col <= ACTION_END_COL; col++) {
 						XSSFCell cell = sheet.getRow(1).getCell(col);
-						System.out.println(cell.getStringCellValue());
 						if(cell.getStringCellValue().matches(next_symbol.getContent())) {
 							return sheet.getRow(current_state + 1).getCell(col).getStringCellValue();
 						};

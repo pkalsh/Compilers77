@@ -7,6 +7,7 @@ public class ReductionRule {
 	// CFG rule 번호 -> <RHS symbol 길이, LHS symbol>
 	public HashMap<Integer, SimpleEntry<Integer, Symbol>> CFG;
 	public ReductionRule() {
+		CFG = new HashMap<Integer, SimpleEntry<Integer, Symbol> >();
 		CFG.put(1, new SimpleEntry<Integer, Symbol>(1, new Symbol("S")));
 		CFG.put(2, new SimpleEntry<Integer, Symbol>(2,new Symbol("CODE")));
 		CFG.put(3, new SimpleEntry<Integer, Symbol>(2,new Symbol("CODE")));
